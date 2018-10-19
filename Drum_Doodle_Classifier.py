@@ -121,11 +121,3 @@ plt.show()
 songs, doodles = otherDataGen()
 everyCombination(model, songs, doodles, LOL)
 
-
-"""
-again = "y"
-while again[0] == 'y':
-    fuel()
-    again = input("Run again? (y/n): ")
-print("Goodbye")
-"""
