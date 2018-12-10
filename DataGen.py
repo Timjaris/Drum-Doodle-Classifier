@@ -96,8 +96,8 @@ def normalize(signal):
         return signal / -min(signal)
 
 def init():
-    songDir = os.getcwd() + '\\Songs'
-    doodleDir = os.getcwd() + '\\Doodles'
+    songDir = os.path.join(os.getcwd(), 'Songs')
+    doodleDir = os.path.join(os.getcwd(), 'Doodles')
     #songs = []
     #doodles = []
     for filename in os.listdir(songDir):
@@ -216,8 +216,8 @@ def dataGen2(N, seconds, set): #timestep? 2d or 1d conv
     
 #Songs unlike the training data by various degrees
 def otherDataGen():
-    songDir = os.getcwd() + '\\Other\\Songs'
-    doodleDir = os.getcwd() + '\\Other\\Doodles'
+    songDir = os.path.join(os.getcwd(), 'Other','Songs')
+    doodleDir = os.path.join(os.getcwd(), 'Other','Doodles')
     songs = []
     doodles = []
     for filename in os.listdir(songDir):
