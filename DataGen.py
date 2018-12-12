@@ -154,8 +154,9 @@ def dataGen(N, seconds, set): #timestep? 2d or 1d conv
             targets.append([0, 1]) #Boolean?
             #targets.append(1)
         else:
-            #Random song, will probably be wrong
+            #Random song, will DEFINITELY be wrong
             m = np.random.randint(len(songs))
+            while n == m: m = np.random.randint(len(songs))
             Song = songs[m].signal
             end = min(len(Song), len(Doodle)) - seconds * 5512
             start = np.random.randint(end)

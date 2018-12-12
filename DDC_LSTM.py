@@ -156,7 +156,7 @@ input_shape = (window, 1)
 
 model = Sequential()
 model.add(LSTM(1, return_sequences=True, input_shape=(window,1))) #maybe don't return seqs? I don't see why that would speed things up tho. 
-model.add(MaxPooling1D(64))
+model.add(MaxPooling1D(128))
 model.add(Flatten())
 
 model.add(Dense(2, activation='softmax'))
@@ -164,11 +164,12 @@ model.compile(loss='categorical_crossentropy', optimizer='sgd')
 print("Model compiled")
 model.summary()
 
+
 p = []
 
 #TODO stop when all in high 90s HAHAHAHAHA
 start = time.time()
-for i in range(10):
+for i in range(1):
     print("Epoch ", i)
     Xt, Yt = dg.dataGen(100, secs, 'train')
     Xv, Yv = dg.dataGen(100, secs, 'val')
@@ -189,6 +190,8 @@ printTime(time.time() - start)
 plt.plot(p)
 plt.show()
 plt.close()
+#model.save('LSTM.h5')
+print('Model Saved')
 
 gameStart = input("Would you like to play a game? ")
 if gameStart[0] == 'y':
@@ -198,7 +201,7 @@ if gameStart[0] == 'y':
     songs = dg.getSongs()
     doodles = dg.getTestDoodles()
     again = 'yepperuni'
-    while again[0] == 'y':
+    while total < 20:
         total += 1
         if np.random.randint(2):
             match = True
@@ -214,7 +217,7 @@ if gameStart[0] == 'y':
         end = min(len(song.signal), len(doodle.signal)) - window
         start = np.random.randint(end)
         problem = song.signal[start:start+window] + doodle.signal[start:start+window]*4
-        wav.write("Problem.wav", 5512, problem)
+        wav.write("Example"+str(total)+".wav", 5512, problem)
         a = input("Did that match? ")
         if (a[0] == 'y') == match:
             humanCorrect += 1
@@ -236,7 +239,7 @@ if gameStart[0] == 'y':
         print('Human: ', humanCorrect, '/', total)
         print('Model: ', aiCorrect, '/', total)
         print()
-        again = input('Again? ')
+        #again = input('Again? ')
         
     print("Totals:")
     print('Human: ', humanCorrect, '/', total, ' = ', round(humanCorrect/total*100), '%')
@@ -245,5 +248,27 @@ if gameStart[0] == 'y':
 #test = testSong(model, songs[0], doodles[0], freq * secs)
 #songs, doodles = otherDataGen()
 #everyCombination(model, songs, doodles, window)
-
-
+#https://github.com/Timjaris/Drum-Doodle-Classifier.git
+#10 epochs: 2 hours,41 minutes,53 seconds
+"""
+1: n
+2: n
+3: n
+4: y
+5: y
+6: y
+7: n
+8: y
+9: y
+10: y
+11: y
+12: y
+13: y
+14: n
+15: y
+16: n
+17: n
+18: n
+19: y
+20: y
+"""
