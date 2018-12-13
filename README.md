@@ -1,4 +1,6 @@
 # Drum-Doodle-Classifier
+Nevermind, it never actually worked
+
 Classifies doodles from a drum pad based on whether or not they match a song. 
 
 How it works is that you put some .wav songs in a folder called "Songs", then record yourself 
