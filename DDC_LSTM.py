@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 
 from keras.models import Sequential
 from keras.layers.core import Dense, Activation, Flatten
-from keras.layers import Conv1D, MaxPooling1D, LSTM
+from keras.layers import Conv1D, MaxPooling1D, LSTM, Dropout
 from keras.optimizers import Adam
 
 import DataGen as dg
@@ -81,7 +81,16 @@ def validate2(model, Xv, Yv):
         if (pred[i][0] <= pred[i][1]) == (Yv[i][0] <= Yv[i][1]):
             correct += 1
     print("Segments classified correctly = ", correct, " / ", len(Xv), " = ", correct/len(Xv))
-    return correct / len(Xv)    
+    return correct / len(Xv) 
+
+def validate3(model, Xv, Yv):
+    pred = model.predict(Xv)
+    correct = 0
+    for i in range(len(Xv)):
+        if (pred[i] <= 0.5) == (Yv[i] <= 0.5):
+            correct += 1
+    print("Segments classified correctly = ", correct, " / ", len(Xv), " = ", correct/len(Xv))
+    return correct / len(Xv)       
 
 def everyCombination(model, songs, doodles, window):
     correct = 0
@@ -147,47 +156,62 @@ def correctSongs(model, songs, doodles, window):
 
 dg.init()
 #Xt, Yt = dataGen(10, secs)
-#game(songs, doodles)
-secs = 5
+
+
+#times = [0]
+#frequencies = [0]
+secs = 5 
 freq = 5512
 window = int(secs * freq)
 input_shape = (window, 1)
 
 
 model = Sequential()
-model.add(LSTM(1, return_sequences=True, input_shape=(window,1))) #maybe don't return seqs? I don't see why that would speed things up tho. 
-model.add(MaxPooling1D(128))
+model.add(Conv1D(256, 4, strides=2, input_shape=(window,1)))
+model.add(MaxPooling1D())
+model.add(Conv1D(256, 4, strides=2))
+model.add(MaxPooling1D())
+model.add(Conv1D(256, 4, strides=2))
+model.add(MaxPooling1D())
+model.add(MaxPooling1D(pool_size=4))
 model.add(Flatten())
-
-model.add(Dense(2, activation='softmax'))
+model.add(Dense(16))
+model.add(Dropout(0.1))
+model.add(Dense(2))
+model.add(Dropout(0.1))
 model.compile(loss='categorical_crossentropy', optimizer='sgd')
 print("Model compiled")
 model.summary()
 
 
-p = []
-
-#TODO stop when all in high 90s HAHAHAHAHA
 start = time.time()
-for i in range(1):
+p = []
+for i in range(20):
     print("Epoch ", i)
     Xt, Yt = dg.dataGen(100, secs, 'train')
+    #Yt = Yt[:,0]
     Xv, Yv = dg.dataGen(100, secs, 'val')
+    #Yv = Yv[:,0]
     model.fit(Xt, Yt,
                  epochs = 1,
-                 batch_size=16,
                  verbose=2, 
                  validation_data=((Xv, Yv)))
     
     #correctSongs(model, songs, doodles, freq)
     p.append(validate2(model, Xv, Yv))
-"""
-print("Output: ")
-print(model.predict(Xv))
-"""
+
 print("Training Time:", end='')
 printTime(time.time() - start)
+
 plt.plot(p)
+plt.show()
+plt.close()
+    
+    #times.append(time.time() - start)
+    #frequencies.append(window)
+plt.xlabel("Frequency (Hz)")
+plt.ylabel("Training time (seconds)")
+plt.plot(frequencies, times, 'bo-')
 plt.show()
 plt.close()
 #model.save('LSTM.h5')
